@@ -88,6 +88,12 @@
           </div>
         </div>
 
+        <div class="career-section" id="career-section">
+          <h3 class="career-section__title">🎯 Career & Skill Recommendations (from your strong subjects)</h3>
+          <p class="career-section__subtitle">Based on your strong subjects, here are suitable career paths and ways to sharpen your skills.</p>
+          <div id="career-cards" class="career-cards"></div>
+        </div>
+
         <div class="table-wrap">
           <h3>All Test Records</h3>
           <table class="data-table" id="marks-table">
@@ -145,7 +151,7 @@
         <p class="panel__subtitle">Add, edit, and track your assignments. Mark as done when complete.</p>
 
         <div class="form-card">
-          <h3>Add Assignment</h3>
+          <h3 id="assignment-form-title">Add Assignment</h3>
           <div class="form-row">
             <input type="text" id="assignment-title" placeholder="Assignment title" />
             <input type="text" id="assignment-subject" placeholder="Subject" />
@@ -156,6 +162,7 @@
               <option value="high">High</option>
             </select>
             <button type="button" class="btn btn--primary" id="add-assignment-btn">Add</button>
+            <button type="button" class="btn btn--secondary" id="cancel-edit-assignment-btn" style="display: none;">Cancel</button>
           </div>
         </div>
 

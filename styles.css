@@ -367,6 +367,86 @@ body {
 }
 
 /* ==========================================================================
+   Career & Skill Recommendations
+   ========================================================================== */
+.career-section {
+  margin-bottom: var(--space-8);
+  padding: var(--space-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.career-section__title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-lg);
+}
+
+.career-section__subtitle {
+  margin: 0 0 var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.career-section__empty {
+  margin: 0;
+  padding: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+}
+
+.career-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+
+.career-card {
+  padding: var(--space-5);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  border-left: 4px solid var(--color-accent);
+}
+
+.career-card__subject {
+  font-weight: 700;
+  color: var(--color-accent);
+  margin-bottom: var(--space-2);
+  font-size: var(--text-base);
+}
+
+.career-card__jobs {
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-3);
+}
+
+.career-card__jobs strong {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-1);
+}
+
+.career-card__skills {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.career-card__skills strong {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-1);
+}
+
+/* ==========================================================================
    Tables
    ========================================================================== */
 .table-wrap {

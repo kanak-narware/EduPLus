@@ -1,6 +1,15 @@
-# Landing Page (Figma-aligned)
+# StudySmart — AI-Driven Smart Academic & Skill Management System
 
-A landing page built so **layout, colours, typography, and elements** can match your [Figma design](https://www.figma.com/make/BFj9YtMXUV7ZNKyMyD4SeN/Untitled) exactly.
+A student-focused prototype that tracks performance, timetable, assignments, attendance, and career recommendations with AI-style insights.
+
+## Features
+
+- **Subject Performance** — Add subjects and test-wise marks. The app automatically splits subjects into **weak** (&lt; 60%) and **strong** (≥ 60%).
+- **Career & Skill Recommendations** — Based on your strong subjects, get suggested careers and tips on how to sharpen your skills (Mathematics, Physics, Chemistry, Computer Science, English, Economics, etc.).
+- **Editable Timetable** — Weekly timetable (Mon–Sat). Set start/end time and click any cell to edit; data is saved in the browser.
+- **Assignment Checker** — Add, **edit**, and track assignments (title, subject, due date, priority). Mark as done; edit any assignment via the Edit button.
+- **Attendance Tracker** — Log present, absent, or holiday. **AI-style insight** warns you when attendance is low or when taking more holidays may shorten your attendance percentage.
+- **AI Study Assistant** — Chat-style assistant (simulated) for study tips, subject-specific advice, timetable and attendance tips.
 
 ## Quick start
 
@@ -10,47 +19,16 @@ Open `index.html` in a browser, or run a local server:
 npx serve .
 ```
 
-## Matching the Figma design exactly
+## Data
 
-### 1. Colours
-
-In **Figma**: Inspect → copy fill hex values.  
-In **`styles.css`**: update the `:root` variables:
-
-- `--color-bg`, `--color-bg-elevated`, `--color-surface` — backgrounds
-- `--color-text`, `--color-text-muted` — body and secondary text
-- `--color-accent`, `--color-accent-hover` — buttons and highlights
-- `--color-border` — borders and dividers
-
-### 2. Typography
-
-In **Figma**: Inspect → font family, size, weight, line height.  
-In **`styles.css`**: update `--font-sans` and the `--text-*` / `--leading-*` variables. Change the Google Fonts link in `index.html` if you use a different font.
-
-### 3. Spacing and layout
-
-In **Figma**: use Auto Layout padding/gap values.  
-In **`styles.css`**: set `--space-*` and `--container-max` / `--container-padding` to match.
-
-### 4. Images
-
-- Export images from Figma (right‑click → Export), or use the **Framelink MCP** tool `download_figma_images` with your file key and node IDs.
-- Put them in `assets/` as `hero-image.jpg` and `about-image.jpg` (or update the `src` in `index.html` to match your filenames).
-
-### 5. Content and sections
-
-Edit `index.html` to match copy, headings, and section order from your Figma frames. Add or remove sections as in the design.
+All data is stored in the browser (localStorage). No backend or API keys are required for this prototype.
 
 ## File structure
 
 ```
-├── index.html    # Structure and content
-├── styles.css    # Design tokens + layout (edit here to match Figma)
-├── script.js     # Image fallback, etc.
-├── assets/       # hero-image.jpg, about-image.jpg
+├── index.html   # App structure and panels
+├── styles.css   # Design tokens and layout
+├── script.js    # Logic: performance, timetable, assignments, attendance, chat, career recommendations
+├── assets/
 └── README.md
 ```
-
-## Figma API note
-
-The file at `figma.com/make/...` may not be accessible via the standard Figma Files API (e.g. 400). To use **Framelink MCP** (`get_figma_data`, `download_figma_images`), open the same design in a normal Figma file (File → Save as .fig or duplicate to a team file) and use that file’s key in the MCP tools.

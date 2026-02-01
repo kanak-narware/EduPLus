@@ -23,6 +23,7 @@ function showPanel(panelId) {
   if (panel) panel.classList.add('active');
   if (btn) btn.classList.add('active');
   if (panelId === 'timetable') initTimetable();
+  if (panelId === 'performance') renderCareerRecommendations();
 }
 
 document.querySelectorAll('.nav__btn').forEach(btn => {
@@ -69,6 +70,108 @@ function getSubjectAverages() {
     name,
     avg: Math.round((d.sum / d.count) * 10) / 10
   }));
+}
+
+// Career & skill recommendations based on strong subjects (exact keys only; "default" used for unmapped subjects)
+const CAREER_MAP = {
+  mathematics: {
+    jobs: 'Data Scientist, Actuary, Quantitative Analyst, Software Engineer, Statistician, Financial Analyst, Research Scientist',
+    skills: 'Practice problem-solving daily, take online courses (e.g. linear algebra, probability), contribute to open-source math libraries, participate in math competitions or hackathons.'
+  },
+  maths: {
+    jobs: 'Data Scientist, Actuary, Quantitative Analyst, Software Engineer, Statistician, Financial Analyst, Research Scientist',
+    skills: 'Practice problem-solving daily, take online courses (e.g. linear algebra, probability), contribute to open-source math libraries, participate in math competitions or hackathons.'
+  },
+  math: {
+    jobs: 'Data Scientist, Actuary, Quantitative Analyst, Software Engineer, Statistician, Financial Analyst, Research Scientist',
+    skills: 'Practice problem-solving daily, take online courses (e.g. linear algebra, probability), contribute to open-source math libraries, participate in math competitions or hackathons.'
+  },
+  physics: {
+    jobs: 'Engineer (Mechanical/Electrical/Aerospace), Physicist, Data Scientist, Research Scientist, Patent Analyst, Technical Writer',
+    skills: 'Build small projects (e.g. circuits, simulations), read research papers, use simulation software (e.g. MATLAB, Python), join physics clubs or Olympiads.'
+  },
+  chemistry: {
+    jobs: 'Chemist, Pharmacist, Lab Analyst, Materials Scientist, Environmental Scientist, Quality Control Specialist, Research Scientist',
+    skills: 'Hands-on lab practice, stay updated with journals, learn instrumentation and safety protocols, consider internships in labs or pharma.'
+  },
+  biology: {
+    jobs: 'Biologist, Healthcare Professional, Biotech Researcher, Environmental Consultant, Science Writer, Lab Technician',
+    skills: 'Practical lab work, stay current with biology research, volunteer in healthcare or conservation, consider certifications in lab techniques.'
+  },
+  computer: {
+    jobs: 'Software Developer, DevOps Engineer, Data Engineer, Systems Analyst, IT Consultant, Cybersecurity Specialist',
+    skills: 'Build projects, contribute to GitHub, learn new frameworks, practice algorithms (LeetCode, HackerRank), get certifications (AWS, etc.).'
+  },
+  'computer science': {
+    jobs: 'Software Developer, DevOps Engineer, Data Engineer, Systems Analyst, IT Consultant, Cybersecurity Specialist',
+    skills: 'Build projects, contribute to GitHub, learn new frameworks, practice algorithms (LeetCode, HackerRank), get certifications (AWS, etc.).'
+  },
+  programming: {
+    jobs: 'Software Developer, DevOps Engineer, Data Engineer, Systems Analyst, IT Consultant, Cybersecurity Specialist',
+    skills: 'Build projects, contribute to GitHub, learn new frameworks, practice algorithms (LeetCode, HackerRank), get certifications (AWS, etc.).'
+  },
+  english: {
+    jobs: 'Content Writer, Editor, Copywriter, Communications Specialist, Teacher, Journalist, Technical Writer',
+    skills: 'Write regularly, read widely, take writing courses, build a portfolio, practice grammar and style guides.'
+  },
+  economics: {
+    jobs: 'Economist, Financial Analyst, Policy Analyst, Consultant, Banker, Data Analyst',
+    skills: 'Follow economic news, use data tools (Excel, R, Python), do case studies, consider CFA or similar certifications.'
+  },
+  history: {
+    jobs: 'Historian, Archivist, Museum Curator, Policy Researcher, Writer, Teacher',
+    skills: 'Primary source analysis, writing and research, internships at museums or archives, learn digital humanities tools.'
+  },
+  default: {
+    jobs: 'Analyst, Researcher, Consultant, Specialist in your field of interest',
+    skills: 'Identify core competencies, take relevant courses, build a portfolio or projects, network and seek internships.'
+  }
+};
+
+// Match subject name to career entry: exact match first, then subject contains key (longest first), then key contains subject
+function getCareerForSubject(subjectName) {
+  const key = subjectName.toLowerCase().trim();
+  if (CAREER_MAP[key]) return CAREER_MAP[key];
+  const mapKeys = Object.keys(CAREER_MAP).filter(k => k !== 'default');
+  const bySubjectContains = mapKeys.filter(k => key.includes(k)).sort((a, b) => b.length - a.length);
+  if (bySubjectContains.length) return CAREER_MAP[bySubjectContains[0]];
+  const byKeyContains = mapKeys.find(k => k.includes(key));
+  if (byKeyContains) return CAREER_MAP[byKeyContains];
+  return CAREER_MAP.default;
+}
+
+function renderCareerRecommendations() {
+  const section = document.getElementById('career-section');
+  const cardsEl = document.getElementById('career-cards');
+  if (!section || !cardsEl) return;
+
+  const averages = getSubjectAverages();
+  const strong = averages.filter(s => s.avg >= 60).sort((a, b) => b.avg - a.avg);
+
+  section.style.display = 'block';
+
+  if (strong.length === 0) {
+    cardsEl.innerHTML = '<p class="career-section__empty">Add test marks above and score <strong>60% or above</strong> in a subject to see career and skill recommendations here.</p>';
+    return;
+  }
+
+  cardsEl.innerHTML = strong.map(s => {
+    const career = getCareerForSubject(s.name);
+    const jobs = (career && career.jobs) ? String(career.jobs) : 'Analyst, Researcher, Specialist in your field.';
+    const skills = (career && career.skills) ? String(career.skills) : 'Take relevant courses, build a portfolio, network and seek internships.';
+    return `
+      <div class="career-card">
+        <div class="career-card__subject">${escapeHtml(s.name)} (${s.avg}%)</div>
+        <div class="career-card__jobs"><strong>Suggested careers</strong> ${escapeHtml(jobs)}</div>
+        <div class="career-card__skills"><strong>How to sharpen skills</strong> ${escapeHtml(skills)}</div>
+      </div>`;
+  }).join('');
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
 
 function renderPerformance() {
@@ -156,9 +259,10 @@ document.getElementById('apply-time-btn')?.addEventListener('click', () => {
 });
 
 // ============================================================================
-// Assignments
+// Assignments (editable)
 // ============================================================================
 let assignmentsData = JSON.parse(localStorage.getItem(STORAGE_KEYS.assignments) || '[]');
+let editingAssignmentId = null;
 
 function saveAssignments() {
   localStorage.setItem(STORAGE_KEYS.assignments, JSON.stringify(assignmentsData));
@@ -171,11 +275,49 @@ function addAssignment() {
   const due = document.getElementById('assignment-due').value;
   const priority = document.getElementById('assignment-priority').value;
   if (!title) return;
-  assignmentsData.push({ id: Date.now(), title, subject, due, priority, done: false });
+
+  if (editingAssignmentId !== null) {
+    const a = assignmentsData.find(x => x.id === editingAssignmentId);
+    if (a) {
+      a.title = title;
+      a.subject = subject;
+      a.due = due;
+      a.priority = priority;
+    }
+    cancelEditAssignment();
+  } else {
+    assignmentsData.push({ id: Date.now(), title, subject, due, priority, done: false });
+  }
+
   document.getElementById('assignment-title').value = '';
   document.getElementById('assignment-subject').value = '';
   document.getElementById('assignment-due').value = '';
+  document.getElementById('assignment-priority').value = 'medium';
   saveAssignments();
+}
+
+function editAssignment(id) {
+  const a = assignmentsData.find(x => x.id === id);
+  if (!a) return;
+  editingAssignmentId = id;
+  document.getElementById('assignment-title').value = a.title;
+  document.getElementById('assignment-subject').value = a.subject || '';
+  document.getElementById('assignment-due').value = a.due || '';
+  document.getElementById('assignment-priority').value = a.priority || 'medium';
+  document.getElementById('assignment-form-title').textContent = 'Edit Assignment';
+  document.getElementById('add-assignment-btn').textContent = 'Update';
+  document.getElementById('cancel-edit-assignment-btn').style.display = 'inline-block';
+}
+
+function cancelEditAssignment() {
+  editingAssignmentId = null;
+  document.getElementById('assignment-title').value = '';
+  document.getElementById('assignment-subject').value = '';
+  document.getElementById('assignment-due').value = '';
+  document.getElementById('assignment-priority').value = 'medium';
+  document.getElementById('assignment-form-title').textContent = 'Add Assignment';
+  document.getElementById('add-assignment-btn').textContent = 'Add';
+  document.getElementById('cancel-edit-assignment-btn').style.display = 'none';
 }
 
 function toggleAssignment(id) {
@@ -186,6 +328,7 @@ function toggleAssignment(id) {
 
 function deleteAssignment(id) {
   assignmentsData = assignmentsData.filter(a => a.id !== id);
+  if (editingAssignmentId === id) cancelEditAssignment();
   saveAssignments();
 }
 
@@ -200,6 +343,7 @@ function renderAssignments() {
           </div>
           <div class="assignment-actions">
             <input type="checkbox" ${a.done ? 'checked' : ''} onchange="toggleAssignment(${a.id})" title="Mark done" />
+            <button class="btn btn--secondary btn--small" onclick="editAssignment(${a.id})">Edit</button>
             <button class="btn btn--danger btn--small" onclick="deleteAssignment(${a.id})">Delete</button>
           </div>
         </div>
@@ -208,6 +352,7 @@ function renderAssignments() {
 }
 
 document.getElementById('add-assignment-btn')?.addEventListener('click', addAssignment);
+document.getElementById('cancel-edit-assignment-btn')?.addEventListener('click', cancelEditAssignment);
 
 // ============================================================================
 // Attendance Tracker & AI Insights
