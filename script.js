@@ -23,7 +23,10 @@ function showPanel(panelId) {
   if (panel) panel.classList.add('active');
   if (btn) btn.classList.add('active');
   if (panelId === 'timetable') initTimetable();
-  if (panelId === 'performance') renderCareerRecommendations();
+  if (panelId === 'performance') {
+    renderCareerRecommendations();
+    renderWeakSubjectRecommendations();
+  }
 }
 
 document.querySelectorAll('.nav__btn').forEach(btn => {
@@ -70,6 +73,108 @@ function getSubjectAverages() {
     name,
     avg: Math.round((d.sum / d.count) * 10) / 10
   }));
+}
+
+// AI recommendations to improve weak subjects (study strategies, resources, focus areas)
+const IMPROVEMENT_MAP = {
+  mathematics: {
+    tips: 'Practice daily with graded problems: start easy, then increase difficulty. Write down every step instead of solving in your head. Revise formulas in a small notebook and use them in problems the same day.',
+    resources: 'Use Khan Academy, Brilliant, or your textbook exercises. Try past exam papers and time yourself. Form a study group to explain concepts to each other.',
+    focus: 'Identify which topics (algebra, geometry, calculus, etc.) pull your average down and dedicate 2–3 sessions per week to those only.'
+  },
+  maths: {
+    tips: 'Practice daily with graded problems: start easy, then increase difficulty. Write down every step instead of solving in your head. Revise formulas in a small notebook and use them in problems the same day.',
+    resources: 'Use Khan Academy, Brilliant, or your textbook exercises. Try past exam papers and time yourself. Form a study group to explain concepts to each other.',
+    focus: 'Identify which topics (algebra, geometry, calculus, etc.) pull your average down and dedicate 2–3 sessions per week to those only.'
+  },
+  math: {
+    tips: 'Practice daily with graded problems: start easy, then increase difficulty. Write down every step instead of solving in your head. Revise formulas in a small notebook and use them in problems the same day.',
+    resources: 'Use Khan Academy, Brilliant, or your textbook exercises. Try past exam papers and time yourself. Form a study group to explain concepts to each other.',
+    focus: 'Identify which topics (algebra, geometry, calculus, etc.) pull your average down and dedicate 2–3 sessions per week to those only.'
+  },
+  physics: {
+    tips: 'Draw diagrams for every problem. Write down knowns and unknowns, and list equations before substituting. Check units in every step. Practice numericals from the same chapter until the method is automatic.',
+    resources: 'Textbook examples, PhET simulations, and YouTube channels (e.g. Veritasium, Khan Academy). Solve previous years’ papers and mock tests.',
+    focus: 'Pinpoint weak topics (mechanics, electricity, optics, etc.) and do 5–10 problems per topic per week. Focus on understanding why a formula applies, not just memorizing it.'
+  },
+  chemistry: {
+    tips: 'Balance theory with practice: read a concept, then do 3–5 numericals or equation-based questions. Use flashcards for reactions and periodic table trends. Revise organic reaction mechanisms by drawing them repeatedly.',
+    resources: 'Textbook, NCERT/board exemplars, and online problem sets. Use MolView or similar for 3D structures. Practice writing balanced equations daily.',
+    focus: 'If inorganic is weak, make summary tables (e.g. group-wise properties). If organic is weak, focus on reaction conditions and mechanisms. If physical is weak, practice numericals and unit conversions.'
+  },
+  biology: {
+    tips: 'Use flowcharts and diagrams for processes (e.g. respiration, mitosis). Write short summaries in your own words after each chapter. Revise definitions and spellings; many marks are lost to incomplete or wrong terms.',
+    resources: 'Textbook diagrams, NCERT, and video lectures for complex processes. Practice labeling diagrams and answering “difference between” type questions.',
+    focus: 'Identify weak units (botany, zoology, genetics, etc.) and allocate extra time. Revise previous chapters weekly to avoid forgetting.'
+  },
+  computer: {
+    tips: 'Code every day, even 20 minutes. Start with small programs, then build a mini project. Read error messages carefully and fix one thing at a time. Comment your code to reinforce logic.',
+    resources: 'Official docs, freeCodeCamp, LeetCode (easy problems first), and your course textbook. Use a single language consistently until basics are solid.',
+    focus: 'If programming is weak, do more hands-on coding. If theory is weak, make notes with examples. Practice previous years’ programs and trace execution on paper.'
+  },
+  'computer science': { tips: 'Same as Computer.', resources: 'Same as Computer.', focus: 'Same as Computer.' },
+  programming: { tips: 'Same as Computer.', resources: 'Same as Computer.', focus: 'Same as Computer.' },
+  english: {
+    tips: 'Read something every day (news, short stories, or your textbook). Practice writing one paragraph daily. Learn 2–3 new words and use them in a sentence. Revise grammar rules with simple exercises.',
+    resources: 'Grammar workbooks, graded readers, and past comprehension passages. Use a dictionary and note example sentences for new words.',
+    focus: 'If comprehension is weak, do one passage daily and summarize it. If writing is weak, get feedback on short essays. If grammar is weak, do targeted exercises (tenses, articles, prepositions).'
+  },
+  economics: {
+    tips: 'Link every concept to a real example (e.g. demand–supply to a product you know). Draw graphs and label axes; practice explaining graphs in words. Solve numericals and case-based questions regularly.',
+    resources: 'Textbook, past papers, and news articles for application. Make one-page summaries per chapter with definitions and one example each.',
+    focus: 'Identify weak areas (micro vs macro, theory vs numericals) and do extra practice. Revise definitions and graph shifts weekly.'
+  },
+  history: {
+    tips: 'Create timelines and mind maps for each period. Link events to causes and effects. Write short answers in bullet points; practice answering “why” and “what was the impact” type questions.',
+    resources: 'Textbook, NCERT, and documentary clips for context. Make summary sheets with dates, key figures, and outcomes.',
+    focus: 'If dates are weak, use flashcards. If long answers are weak, practice one per day and get them checked. Revise previous chapters to retain chronology.'
+  },
+  default: {
+    tips: 'Study in short sessions (25–30 min) with breaks. After each topic, write 3 key points and one question you found hard. Revise the same topic within 24 hours and again in a week.',
+    resources: 'Your textbook, class notes, and past papers. Use summaries or mind maps. If possible, form a study group and teach each other.',
+    focus: 'Identify the specific chapters or question types where you lose marks. Allocate more time to those and practice similar questions until you see improvement.'
+  }
+};
+
+function getImprovementForSubject(subjectName) {
+  const key = subjectName.toLowerCase().trim();
+  if (IMPROVEMENT_MAP[key]) return IMPROVEMENT_MAP[key];
+  const mapKeys = Object.keys(IMPROVEMENT_MAP).filter(k => k !== 'default');
+  const bySubjectContains = mapKeys.filter(k => key.includes(k)).sort((a, b) => b.length - a.length);
+  if (bySubjectContains.length) return IMPROVEMENT_MAP[bySubjectContains[0]];
+  const byKeyContains = mapKeys.find(k => k.includes(key));
+  if (byKeyContains) return IMPROVEMENT_MAP[byKeyContains];
+  return IMPROVEMENT_MAP.default;
+}
+
+function renderWeakSubjectRecommendations() {
+  const section = document.getElementById('weak-improvement-section');
+  const cardsEl = document.getElementById('weak-improvement-cards');
+  if (!section || !cardsEl) return;
+
+  const averages = getSubjectAverages();
+  const weak = averages.filter(s => s.avg < 60).sort((a, b) => a.avg - b.avg);
+
+  section.style.display = 'block';
+
+  if (weak.length === 0) {
+    cardsEl.innerHTML = '<p class="improvement-section__empty">Add test marks above. Subjects with average <strong>below 60%</strong> will appear here with AI recommendations on how to improve.</p>';
+    return;
+  }
+
+  cardsEl.innerHTML = weak.map(s => {
+    const imp = getImprovementForSubject(s.name);
+    const tips = (imp && imp.tips) ? String(imp.tips) : IMPROVEMENT_MAP.default.tips;
+    const resources = (imp && imp.resources) ? String(imp.resources) : IMPROVEMENT_MAP.default.resources;
+    const focus = (imp && imp.focus) ? String(imp.focus) : IMPROVEMENT_MAP.default.focus;
+    return `
+      <div class="improvement-card">
+        <div class="improvement-card__subject">${escapeHtml(s.name)} (${s.avg}%)</div>
+        <div class="improvement-card__tips"><strong>Study strategies</strong> ${escapeHtml(tips)}</div>
+        <div class="improvement-card__resources"><strong>Resources & practice</strong> ${escapeHtml(resources)}</div>
+        <div class="improvement-card__focus"><strong>Focus areas</strong> ${escapeHtml(focus)}</div>
+      </div>`;
+  }).join('');
 }
 
 // Career & skill recommendations based on strong subjects (exact keys only; "default" used for unmapped subjects)
@@ -199,6 +304,9 @@ function renderPerformance() {
       <td><button class="btn btn--danger" onclick="deleteMark(${m.id})">Delete</button></td>
     </tr>`;
   }).join('');
+
+  renderCareerRecommendations();
+  renderWeakSubjectRecommendations();
 }
 
 document.getElementById('add-marks-btn')?.addEventListener('click', addMarks);

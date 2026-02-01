@@ -367,6 +367,81 @@ body {
 }
 
 /* ==========================================================================
+   AI Recommendations: Improve Weak Subjects
+   ========================================================================== */
+.improvement-section {
+  margin-bottom: var(--space-8);
+  padding: var(--space-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.improvement-section__title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-lg);
+}
+
+.improvement-section__subtitle {
+  margin: 0 0 var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.improvement-section__empty {
+  margin: 0;
+  padding: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+}
+
+.improvement-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+
+.improvement-card {
+  padding: var(--space-5);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  border-left: 4px solid var(--color-warning);
+}
+
+.improvement-card__subject {
+  font-weight: 700;
+  color: var(--color-warning);
+  margin-bottom: var(--space-2);
+  font-size: var(--text-base);
+}
+
+.improvement-card__tips strong,
+.improvement-card__resources strong,
+.improvement-card__focus strong {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-1);
+}
+
+.improvement-card__tips,
+.improvement-card__resources,
+.improvement-card__focus {
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-3);
+  color: var(--color-text);
+}
+
+.improvement-card__focus:last-child {
+  margin-bottom: 0;
+}
+
+/* ==========================================================================
    Career & Skill Recommendations
    ========================================================================== */
 .career-section {
